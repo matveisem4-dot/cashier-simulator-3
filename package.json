@@ -1,20 +1,15 @@
 {
-  "dependencies": {
-    "express": "^5.2.1",
-    "qrcode-svg": "^1.1.0",
-    "socket.io": "^4.8.1"
-  },
   "name": "cashier-app",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "engines": { 
+    "node": ">=18.0.0" 
+  },
+  "dependencies": {
+    "qrcode-svg": "^1.1.0",
+    "pusher": "^7.0.0"
+  }
 }
