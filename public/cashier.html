@@ -2,32 +2,58 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Vercel Касса 2025</title>
-    <script src="js.pusher.com"></script>
-    <script src="cdnjs.cloudflare.com"></script>
+    <title>Касса - Симулятор 3</title>
+    <script src="cdn.jsdelivr.net"></script>
+    <style>
+        /* Стили CSS не менялись */
+    </style>
 </head>
 <body>
-    <div id="terminal">
-        <h2>Касса (Vercel)</h2>
-        <input type="number" id="amountInput" value="100">
-        <button onclick="createOrder()">Создать QR</button>
-        <div id="status">Готов</div>
+    <div class="card">
+        <h1>Касса #3</h1>
+        <p>Сумма: <strong id="displayAmount">0.00 руб.</strong></p>
+        <p id="transactionStatus">Ожидание транзакции...</p>
         <div id="qrcode"></div>
+        <p id="statusText" class="status">✅ ОПЛАЧЕНО УСПЕШНО!</p>
     </div>
+
     <script>
-        const pusher = new Pusher('661782bbb2606b4ca876', { cluster: 'us2' }); // Ваши публичные ключи
-        function createOrder() {
-            const amount = document.getElementById('amountInput').value;
-            const orderId = 'ORD' + Date.now();
-            const payUrl = `${window.location.origin}/payment.html?order_id=${orderId}&amount=${amount}`;
-            document.getElementById('qrcode').innerHTML = "";
-            new QRCode(document.getElementById("qrcode"), payUrl);
-            document.getElementById('status').innerText = "Ожидание оплаты...";
-            const channel = pusher.subscribe(orderId);
-            channel.bind('payment-completed', function(data) {
-                document.getElementById('status').innerText = "✅ ОПЛАЧЕНО: " + data.amount + "₽";
-            });
+        let qrCodeInstance = null;
+
+        async function updateCashierScreen() {
+            const res = await fetch('/api/server');
+            const data = await res.json();
+            
+            document.getElementById('displayAmount').innerText = data.amount.toFixed(2) + " руб.";
+
+            if (data.paid) {
+                document.getElementById('statusText').style.display = "block";
+                document.getElementById('qrcode').innerHTML = "";
+                document.getElementById('transactionStatus').innerText = "Транзакция завершена";
+            } else if (data.id) {
+                document.getElementById('statusText').style.display = "none";
+                document.getElementById('transactionStatus').innerText = "Ожидание оплаты...";
+                generateQR(window.location.origin + "/pay.html");
+            } else {
+                // Нет активной транзакции
+                document.getElementById('statusText').style.display = "none";
+                document.getElementById('qrcode').innerHTML = "";
+                document.getElementById('transactionStatus').innerText = "Начните новую транзакцию в админке.";
+            }
         }
+
+        function generateQR(url) {
+            const qrDiv = document.getElementById('qrcode');
+            if (!qrCodeInstance) {
+                qrCodeInstance = new QRCode(qrDiv, url);
+            } else {
+                qrCodeInstance.makeCode(url);
+            }
+        }
+
+        // Обновляем экран кассы каждые 3 секунды
+        setInterval(updateCashierScreen, 3000);
+        updateCashierScreen(); // Первый запуск при загрузке
     </script>
 </body>
 </html>

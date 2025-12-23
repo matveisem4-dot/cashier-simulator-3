@@ -1,21 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система Оплаты</title>
+    <!-- CSS стили не менялись -->
+</head>
 <body>
-    <h1>Оплатить <span id="amt"></span>₽?</h1>
-    <button id="btn" onclick="pay()">ПОДТВЕРДИТЬ ОПЛАТУ</button>
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        document.getElementById('amt').innerText = params.get('amount');
-        const orderId = params.get('order_id');
+    <h1>Симулятор Оплаты</h1>
+    <p>Вы оплачиваете заказ.</p>
+    <button class="btn-pay" onclick="confirmPay()">ПОДТВЕРДИТЬ ОПЛАТУ</button>
 
-        async function pay() {
-            document.getElementById('btn').disabled = true;
-            await fetch('/api/confirm', {
+    <script>
+        async function confirmPay() {
+            const res = await fetch('/api/server', { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId: orderId, amount: params.get('amount') })
+                body: JSON.stringify({ action: 'complete' }) // Отправляем сигнал о завершении
             });
-            alert("Готово! Касса получила сигнал.");
+            if (res.ok) {
+                alert("Оплата прошла! Можете закрыть страницу.");
+            } else {
+                alert("Ошибка оплаты. Нет активной транзакции.");
+            }
         }
     </script>
 </body>
