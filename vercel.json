@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/casher.html" }
+    { "source": "/", "destination": "/casher.html" },
+    { "source": "/api/server", "destination": "/api/handler.js" }
   ]
 }
